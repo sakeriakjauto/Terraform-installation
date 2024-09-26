@@ -1,0 +1,58 @@
+---
+# Ensure necessary packages (curl, unzip) are installed on Debian-based systems.
+- name: Ensure necessary packages are installed
+  apt:
+    name:
+      - unzip  # Needed to extract Terraform zip file.
+      - curl   # Needed to download Terraform from the web.
+    state: present  # Ensure the packages are installed.
+  when: ansible_os_family == "Debian"  # Run this task only on Debian-based systems (Ubuntu, etc.)
+
+# Remove old Terraform binary if it exists.
+- name: Remove old Terraform binary (if exists)
+  file:
+    path: /usr/local/bin/terraform  # Path where Terraform binary is stored.
+    state: absent  # Ensure the binary is deleted.
+
+# Fetch the latest Terraform version number using HashiCorp's checkpoint API.
+- name: Get the latest Terraform version number
+  uri:
+    url: "https://checkpoint-api.hashicorp.com/v1/check/terraform"  # API URL for Terraform version check.
+    return_content: yes  # Return the API response content.
+  register: terraform_version_api  # Store the API response in terraform_version_api variable.
+
+# Set the latest Terraform version as a fact (a reusable variable).
+- name: Set latest Terraform version
+  set_fact:
+    terraform_latest_version: "{{ terraform_version_api.json.current_version }}"  # Set the latest version from API response.
+
+# Download the latest Terraform binary zip file using the latest version number.
+- name: Download Terraform binary
+  get_url:
+    url: "https://releases.hashicorp.com/terraform/{{ terraform_latest_version }}/terraform_{{ terraform_latest_version }}_linux_amd64.zip"  # Download link for the latest Terraform version.
+    dest: "/tmp/terraform.zip"  # Destination to save the zip file.
+
+# Unzip the downloaded Terraform binary into /usr/local/bin directory.
+- name: Unzip Terraform binary
+  unarchive:
+    src: "/tmp/terraform.zip"  # The path to the zip file.
+    dest: "/usr/local/bin"  # Directory where the Terraform binary will be placed.
+    remote_src: yes  # The zip file is already on the target system (remote), not on the Ansible controller.
+
+# Ensure the Terraform binary has the correct permissions to be executable.
+- name: Ensure Terraform binary is executable
+  file:
+    path: "/usr/local/bin/terraform"  # Path to the Terraform binary.
+    mode: '0755'  # Set permissions to allow execution.
+    state: file  # Ensure it's a file and not absent or a directory.
+
+# Run Terraform to check if the installation was successful and get the installed version.
+- name: Verify Terraform installation
+  command: terraform --version  # Command to check the installed version of Terraform.
+  register: terraform_version_output  # Store the command output in terraform_version_output variable.
+  changed_when: false  # Do not mark this task as changed since it's just a check.
+
+# Output the installed Terraform version to verify the installation.
+- name: Show Terraform version
+  debug:
+    msg: "{{ terraform_version_output.stdout }}"  # Print the version output from the previous task.
