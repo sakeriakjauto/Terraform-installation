@@ -19,6 +19,7 @@ pipeline {
 
         stage('Lint All YAML Files') {
             steps {
+                // Lint YAML files, excluding unnecessary directories
                 sh '''
                     find . -name "*.yml" ! -path "./.github/*" -print0 | xargs -0 ansible-lint
                 '''
