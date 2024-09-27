@@ -34,4 +34,4 @@ jobs:
       # Step 5: Run the main Ansible Playbook
       - name: Run Ansible Playbook
         run: |
-          ansible-playbook terraform-playbook.yml
+          ansible-playbook install_terraform.yml
