@@ -1,17 +1,17 @@
 pipeline {
-    agent any
+    agent any  // This tells Jenkins to use any available agent to run the pipeline
 
     stages {
         stage('Checkout Code') {
             steps {
-                // Pull the code from your repository
+                // Step 1: Checkout the code from the repository
                 git branch: 'main', url: 'https://github.com/sakeriakjauto/Terraform-installation.git'
             }
         }
 
-        stage('Set Up Python and Install Ansible') {
+        stage('Set Up Python Environment') {
             steps {
-                // Set up Python and install ansible-lint and Ansible
+                // Step 2: Set up Python and install ansible-lint
                 sh '''
                     python3 -m pip install --upgrade pip
                     pip install ansible ansible-lint
@@ -19,16 +19,18 @@ pipeline {
             }
         }
 
-        stage('Lint Ansible Playbooks') {
+        stage('Lint All YAML Files') {
             steps {
-                // Lint all YAML files
-                sh 'ansible-lint **/*.yml'
+                // Step 3: Lint all YAML files in the repository
+                sh '''
+                    find . -name "*.yml" -print0 | xargs -0 ansible-lint
+                '''
             }
         }
 
         stage('Run Ansible Playbook') {
             steps {
-                // Run the Ansible playbook
+                // Step 4: Run the main Ansible playbook
                 sh 'ansible-playbook install_terraform.yml'
             }
         }
@@ -36,7 +38,6 @@ pipeline {
 
     post {
         always {
-            // Cleanup or notifications
             echo 'Pipeline finished.'
         }
         success {
