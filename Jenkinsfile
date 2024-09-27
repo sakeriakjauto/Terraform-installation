@@ -35,7 +35,7 @@ pipeline {
             }
         }
 
-      stage('Lint install_terraform.yml') {
+        stage('Lint install_terraform.yml') {
             steps {
                 // Lint only the 'install_terraform.yml' file
                 sh '''
@@ -50,7 +50,7 @@ pipeline {
                 // Step 5: Run the Ansible playbook
                 sh '''
                 . venv/bin/activate
-                find . -name "*.yml" -print0 | xargs -0 ansible-lint
+                ansible-playbook install_terraform.yml -vvv
                 '''
             }
         }
