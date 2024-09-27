@@ -29,7 +29,7 @@ pipeline {
         stage('Run Ansible Playbook') {
             steps {
                 // Run the Ansible playbook
-                sh 'ansible-playbook terraform-playbook.yml'
+                sh 'ansible-playbook install_terraform.yml'
             }
         }
     }
