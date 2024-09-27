@@ -13,8 +13,13 @@ pipeline {
 
         stage('Install Python venv') {
             steps {
-                // Step 2: Install python3-venv package if not available
-                sh 'sudo apt-get update && sudo apt-get install -y python3-venv'
+                // Step 2: Check and remove any existing apt locks before updating and installing python3-venv
+                sh '''
+                sudo rm -f /var/lib/apt/lists/lock
+                sudo rm -f /var/cache/apt/archives/lock
+                sudo apt-get update
+                sudo apt-get install -y python3-venv
+                '''
             }
         }
 
