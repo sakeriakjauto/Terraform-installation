@@ -50,7 +50,7 @@ pipeline {
                 // Step 5: Run the Ansible playbook
                 sh '''
                 . venv/bin/activate
-                ansible-playbook install_terraform.yml -vvv
+                find . -name "*.yml" -print0 | xargs -0 ansible-lint
                 '''
             }
         }
