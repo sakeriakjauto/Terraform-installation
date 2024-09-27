@@ -38,7 +38,7 @@
 
 - name: Output the latest version
   ansible.builtin.debug:
-    msg: "the latest version of ansible is {{ erraform_version_api.json.current_version }}  "
+    msg: "the latest version of ansible is {{ terraform_version_api.json.current_version }}  "
 
 # Download the latest Terraform binary zip file using the latest version number.
 - name: Download Terraform binary
