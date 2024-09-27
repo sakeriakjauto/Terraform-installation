@@ -4,30 +4,42 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/sakeriakjauto/Terraform-installation.git'
+                // Step 1: Checkout code from the repository
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']],
+                    userRemoteConfigs: [[url: 'https://github.com/sakeriakjauto/Terraform-installation.git']]
+                ])
             }
         }
 
-        stage('Set Up Python Environment') {
+        stage('Set Up Python') {
             steps {
+                // Step 2: Set up Python environment
                 sh '''
-                    python3 -m pip install --upgrade pip
-                    pip install ansible ansible-lint
+                python3 -m venv venv
+                . venv/bin/activate
+                pip install --upgrade pip
+                pip install ansible ansible-lint
                 '''
             }
         }
 
-        stage('Lint All YAML Files') {
+        stage('Lint YAML Files') {
             steps {
+                // Step 3: Lint all YAML files in the repository
                 sh '''
-                    find . -name "*.yml" -print0 | xargs -0 ansible-lint
+                . venv/bin/activate
+                find . -name "*.yml" -print0 | xargs -0 ansible-lint
                 '''
             }
         }
 
         stage('Run Ansible Playbook') {
             steps {
-                sh 'ansible-playbook install_terraform.yml'
+                // Step 4: Run the Ansible playbook
+                sh '''
+                . venv/bin/activate
+                ansible-playbook install_terraform.yml -vvv
+                '''
             }
         }
     }
@@ -35,9 +47,6 @@ pipeline {
     post {
         always {
             echo 'Pipeline finished.'
-        }
-        success {
-            echo 'Pipeline completed successfully.'
         }
         failure {
             echo 'Pipeline failed.'
