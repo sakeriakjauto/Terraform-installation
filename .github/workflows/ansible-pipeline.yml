@@ -1,6 +1,5 @@
 name: Ansible Terraform Playbook CI
 
-# Trigger the workflow on every push to the main branch
 on:
   push:
     branches:
@@ -8,16 +7,16 @@ on:
 
 jobs:
   run-playbook:
-    runs-on: ubuntu-latest  # Run the job on an Ubuntu VM
+    runs-on: ubuntu-latest
 
     steps:
       # Step 1: Check out the code from the repository
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3  # Updated to the latest version
 
-      # Step 2: Set up Python
+      # Step 2: Set up Python environment
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4  # Updated to the latest version
         with:
           python-version: '3.x'
 
@@ -27,12 +26,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install ansible ansible-lint
 
-      # Step 4: Lint all YAML files using ansible-lint
+      # Step 4: Lint all YAML files (both in root and subfolders)
       - name: Lint all YAML files
         run: |
-          ansible-lint **/*.yml  # Lints all YAML files in the repository
-          
-      # Step 5: Run Ansible Playbook
+          find . -name "*.yml" -print0 | xargs -0 ansible-lint
+
+      # Step 5: Run the main Ansible Playbook
       - name: Run Ansible Playbook
         run: |
           ansible-playbook terraform-playbook.yml
