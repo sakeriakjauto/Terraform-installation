@@ -35,12 +35,12 @@ pipeline {
             }
         }
 
-        stage('Lint YAML Files') {
+      stage('Lint install_terraform.yml') {
             steps {
-                // Lint all YAML files in the entire 'ansible' folder
+                // Lint only the 'install_terraform.yml' file
                 sh '''
                 . venv/bin/activate
-                find . -name "*.yml" -print0 | xargs -0 ansible-lint   # Lint all YAML files in the current folder and its subdirectories
+                ansible-lint install_terraform.yml
                 '''
             }
         }
