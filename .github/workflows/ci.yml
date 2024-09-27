@@ -1,0 +1,33 @@
+name: CI Workflow  # Name of the workflow
+
+# Trigger the workflow on push or pull requests to the main branch
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Run the job on an Ubuntu machine
+
+    steps:
+      # Step 1: Check out the code from the repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Step 2: Set up Node.js (if you're using JavaScript/Node.js projects)
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      # Step 3: Install dependencies (you can customize this based on your project)
+      - name: Install dependencies
+        run: npm install
+
+      # Step 4: Run tests (optional, replace this with your own tests)
+      - name: Run tests
+        run: npm test
