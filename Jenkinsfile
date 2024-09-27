@@ -11,9 +11,16 @@ pipeline {
             }
         }
 
+        stage('Install Python venv') {
+            steps {
+                // Step 2: Install python3-venv package if not available
+                sh 'sudo apt-get update && sudo apt-get install -y python3-venv'
+            }
+        }
+
         stage('Set Up Python') {
             steps {
-                // Step 2: Set up Python environment
+                // Step 3: Set up Python virtual environment
                 sh '''
                 python3 -m venv venv
                 . venv/bin/activate
@@ -25,7 +32,7 @@ pipeline {
 
         stage('Lint YAML Files') {
             steps {
-                // Step 3: Lint all YAML files in the repository
+                // Step 4: Lint all YAML files
                 sh '''
                 . venv/bin/activate
                 find . -name "*.yml" -print0 | xargs -0 ansible-lint
@@ -35,7 +42,7 @@ pipeline {
 
         stage('Run Ansible Playbook') {
             steps {
-                // Step 4: Run the Ansible playbook
+                // Step 5: Run the Ansible playbook
                 sh '''
                 . venv/bin/activate
                 ansible-playbook install_terraform.yml -vvv
