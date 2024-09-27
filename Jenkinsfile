@@ -37,10 +37,10 @@ pipeline {
 
         stage('Lint YAML Files') {
             steps {
-                // Step 4: Lint all YAML files
+                // Lint all YAML files in the entire 'ansible' folder
                 sh '''
                 . venv/bin/activate
-                find . -name "*.yml" -print0 | xargs -0 ansible-lint
+                find . -name "*.yml" -print0 | xargs -0 ansible-lint   # Lint all YAML files in the current folder and its subdirectories
                 '''
             }
         }
